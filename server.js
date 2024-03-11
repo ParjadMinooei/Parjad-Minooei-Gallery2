@@ -25,7 +25,7 @@ app.use(sessions({
   activeDuration: 1 * 60 * 1000,											
   httpOnly: true,                                                         
   secure: true,                                                        
-  ephemeral: true
+  ephemeral: false
 }));
 
 let users = JSON.parse(fs.readFileSync('user.json', 'utf8'));
