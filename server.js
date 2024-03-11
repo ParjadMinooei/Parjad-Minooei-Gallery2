@@ -144,9 +144,10 @@ app.get("/main",express.urlencoded({ extended: true }), (req, res) => {
 });
 
 
-app.post("/main",express.urlencoded({ extended: true }), (req, res) => {
-  var test = req.body.images;
-  req.session.image = test;
+app.post("/main", express.urlencoded({ extended: true }), (req, res) => {
+  if (req.body.images) {
+    req.session.image = req.body.images;
+  }
   res.redirect("/main");
 });
 
