@@ -33,6 +33,31 @@ let users = JSON.parse(fs.readFileSync('user.json', 'utf8'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+//////////////////////////////////////////////////////////////////////////////////
+app.get('/login', (req, res) => {
+  // User authentication should be done here
+
+  // This is a placeholder user object
+  const user = { id: 3 };
+
+  // Setting the user object in the session
+  req.session.user = user;
+
+  // Sending response
+  res.send('Logged in!');
+});
+// Protected route
+app.get('/protected', (req, res) => {
+  // Checking if user is logged in
+  if (req.session && req.session.user) {
+    res.send('Protected information. Congrats!');
+  } else {
+    res.sendStatus(403);
+  }
+});
+//////////////////////////////////////////////////////////////////////////////////
+
+
 app.get('/', (req, res) => {
   res.render('login');
 });
