@@ -24,7 +24,7 @@ app.use(sessions({
   duration: 24 * 60 * 60 * 1000,
   activeDuration: 1 * 60 * 1000,											
   httpOnly: true,                                                         
-  secure: true,                                                        
+  secure: false,                                                        
   ephemeral: true
 }));
 
