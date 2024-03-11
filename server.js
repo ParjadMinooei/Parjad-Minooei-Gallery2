@@ -23,40 +23,17 @@ app.use(sessions({
   cookieName: 'session',
   duration: 24 * 60 * 60 * 1000,
   activeDuration: 1 * 60 * 1000,											
-  httpOnly: true,                                                         
+  httpsOnly: true,                                                         
   secure: true,                                                        
-  ephemeral: false
+  ephemeral: true,
+  resave: false,
+  saveUninitialized: true,   
 }));
 
 let users = JSON.parse(fs.readFileSync('user.json', 'utf8'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-//////////////////////////////////////////////////////////////////////////////////
-app.get('/login', (req, res) => {
-  // User authentication should be done here
-
-  // This is a placeholder user object
-  const user = { id: 3 };
-
-  // Setting the user object in the session
-  req.session.user = user;
-
-  // Sending response
-  res.send('Logged in!');
-});
-// Protected route
-app.get('/protected', (req, res) => {
-  // Checking if user is logged in
-  if (req.session && req.session.user) {
-    res.send('Protected information. Congrats!');
-  } else {
-    res.sendStatus(403);
-  }
-});
-//////////////////////////////////////////////////////////////////////////////////
-
 
 app.get('/', (req, res) => {
   res.render('login');
@@ -71,10 +48,10 @@ app.post('/', (req, res) => {
   }
 
   if (!users[username]) {
-    return res.render('login', { error: 'Not a registered username' });
+    res.render('login', { error: 'Not a registered username' });
   } else {
     if (password !== users[username]) {
-      return res.render('login', { error: 'Invalid password' });
+      res.render('login', { error: 'Invalid password' });
     } else {
       req.session.username = username;
       res.redirect('/main');
@@ -82,12 +59,12 @@ app.post('/', (req, res) => {
   }
 });
 
-
 app.get('/gallery', (req, res) => {
+  var test = req.session.username;
   if (!req.session.username) {
     res.redirect('/');
   } else {
-    res.render('viewData', { username: req.session.username });
+    res.render('viewData', { username: test });
   }
 });
 
@@ -101,83 +78,76 @@ let numArray;
 var finalarr = [];
 
 rl.on("line", (line, lineCount, byteCount) => {
-  textByLine.push(line);
+    textByLine.push(line);
 })
 .on("error", (err) => {
-  console.error(err);
+    console.error(err);
 })
 .on("end", () =>{
-numArray = textByLine.toString().split(",");
-for (var i = 0; i < numArray.length; i++){
-  var word = "";
-  var finalword = "";
-  word = numArray[i]
-  for (var d = 0; d < word.length; d++){
-      if (word[d] === "."){
-          break;
+  numArray = textByLine.toString().split(",");
+  for (var i = 0; i < numArray.length; i++){
+    var word = "";
+    var finalword = "";
+    word = numArray[i]
+    for (var d = 0; d < word.length; d++){
+        if (word[d] === "."){
+            break;
+          }
+          else {
+           finalword += word[d];
+          }
         }
-        else {
-         finalword += word[d];
-        }
-      }
-  finalarr.push(finalword); 
-}
+    finalarr.push(finalword); 
+  }
 });
 
 app.use(express.static('public'));
 
 app.get("/main",express.urlencoded({ extended: true }), (req, res) => {
-  if (!req.session.username) {
-    res.redirect('/');
-  } else {
-    var imageList = [];
-    var test = [];
-    var result = "";
-    var result2 = "";
-    var passedVariable = req.session.image;
-    if (passedVariable === undefined || passedVariable === null || passedVariable === `${undefined}` || passedVariable === 'undefined'){
-      result = `./images/Waterfall.webp`;
-      result2 = `Gallery`;
-      
-    }
-    else {
-      let rx = /\[(-?\d+)\]/;
-      var num = 0;
-      num = passedVariable.match(rx)[1];
-      result = `./images/${textByLine[num]}`;
-      result2 = finalarr[num];
-
-    }
-    var size = textByLine.length;
-    for (var i =0; i < size; i++){
-      imageList.push({src: `./images/${textByLine[i]}`, name:`${finalarr[i]}`});
-    }
-    var moreData = {
-      number1: result
-    };
-    var someData = {
-      number2: result2
-    };
-    res.render ('viewData', {
-      username: req.session.username, 
-      imageList:imageList,
-      test:test,
-      data1: moreData,
-      data2: someData
-    });
+  var imageList = [];
+  var test = [];
+  var result = "";
+  var result2 = "";
+  var passedVariable = req.query.valid;
+  if (passedVariable === undefined || passedVariable === null || passedVariable === `${undefined}` || passedVariable === 'undefined'){
+    result = `./images/Waterfall.webp`;
+    result2 = `Gallery`;
+    
   }
+  else {
+    let rx = /\[(-?\d+)\]/;
+    var num = 0;
+    num = passedVariable.match(rx)[1];
+    result = `./images/${textByLine[num]}`;
+    result2 = finalarr[num];
+
+  }
+  var size = textByLine.length;
+  for (var i =0; i < size; i++){
+    imageList.push({src: `./images/${textByLine[i]}`, name:`${finalarr[i]}`});
+  }
+  var moreData = {
+    number1: result
+  };
+  var someData = {
+    number2: result2
+  };
+  res.render ('viewData', {
+    username: req.session.username, 
+    imageList:imageList,
+    test:test,
+    data1: moreData,
+    data2: someData
+  });
 });
 
-
-app.post("/main", express.urlencoded({ extended: true }), (req, res) => {
-  if (req.body.images) {
-    req.session.image = req.body.images;
-  }
-  res.redirect("/main");
+app.post("/main",express.urlencoded({ extended: true }), (req, res) => {
+  var test = req.body.images;
+  res.redirect("/main?valid=" + test);
 });
 
 app.use(function(req, res, next) {
-  res.status(404).send("Sorry, we couldn't find that!");
+  res.send("FAILED! Fix your URL");
 });
 
 app.listen(port, () => {
