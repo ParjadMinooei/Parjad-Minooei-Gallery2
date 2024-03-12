@@ -16,10 +16,10 @@ app.engine(".hbs", exphbs.engine({
 }));
 app.set('view engine', '.hbs');
 
-let myRandomString = randomstring.generate(7);
+const secret = randomstring.generate(7);
 
 app.use(sessions({
-  secret: "myRandomString",
+  secret: secret,
   cookieName: 'session',
   duration: 24 * 60 * 60 * 1000,
   activeDuration: 1 * 60 * 1000,											
