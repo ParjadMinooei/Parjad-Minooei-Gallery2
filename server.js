@@ -16,10 +16,10 @@ app.engine(".hbs", exphbs.engine({
 }));
 app.set('view engine', '.hbs');
 
-const secret = randomstring.generate();
+//const secret = randomstring.generate(7);
 
 app.use(sessions({
-  secret: "secret",
+  secret: randomstring.generate(7),
   cookieName: 'session',
   duration: 24 * 60 * 60 * 1000,
   activeDuration: 1 * 60 * 1000,											
@@ -27,6 +27,17 @@ app.use(sessions({
   secure: true,                                                        
   ephemeral: true
 }));
+
+app.get('/setdata', function(req, res) {
+  req.session.data = 'test';
+  res.send('Data set');
+});
+app.get('/getdata', function(req, res) {
+  res.send(req.session.data);
+});
+
+
+
 
 let users = JSON.parse(fs.readFileSync('user.json', 'utf8'));
 
