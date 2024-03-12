@@ -19,7 +19,7 @@ app.set('view engine', '.hbs');
 const secret = randomstring.generate();
 
 app.use(sessions({
-  secret: secret,
+  secret: "secret",
   cookieName: 'session',
   duration: 24 * 60 * 60 * 1000,
   activeDuration: 1 * 60 * 1000,											
