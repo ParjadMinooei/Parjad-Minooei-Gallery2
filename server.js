@@ -17,9 +17,15 @@ app.engine(".hbs", exphbs.engine({
 app.set('view engine', '.hbs');
 
 //const secret = randomstring.generate(7);
+let sessionSecret = process.env.SESSION_SECRET;
+
+if (!sessionSecret) {
+  sessionSecret = randomstring.generate(7);
+  process.env.SESSION_SECRET = sessionSecret;
+}
 
 app.use(sessions({
-  secret: randomstring.generate(7),
+  secret: sessionSecret,
   cookieName: 'session',
   duration: 24 * 60 * 60 * 1000,
   activeDuration: 1 * 60 * 1000,											
@@ -28,13 +34,7 @@ app.use(sessions({
   ephemeral: true
 }));
 
-app.get('/setdata', function(req, res) {
-  req.session.data = 'test';
-  res.send('Data set');
-});
-app.get('/getdata', function(req, res) {
-  res.send(req.session.data);
-});
+
 
 
 
