@@ -19,11 +19,12 @@ app.set('view engine', '.hbs');
 let myRandomString = randomstring.generate(7);
 
 app.use(sessions({
+  secret: "myRandomString",
   cookieName: 'session',
   duration: 24 * 60 * 60 * 1000,
   activeDuration: 1 * 60 * 1000,											
   httpOnly: true,                                                         
-  secure: false,                                                        
+  secure: true,                                                        
   ephemeral: true
 }));
 
