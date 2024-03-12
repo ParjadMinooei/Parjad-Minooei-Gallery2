@@ -16,7 +16,7 @@ app.engine(".hbs", exphbs.engine({
 }));
 app.set('view engine', '.hbs');
 
-const secret = randomstring.generate(7);
+const secret = randomstring.generate();
 
 app.use(sessions({
   secret: secret,
