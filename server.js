@@ -16,9 +16,10 @@ app.engine(".hbs", exphbs.engine({
 }));
 app.set('view engine', '.hbs');
 
-//const secret = randomstring.generate(7);
-
-
+//const random = randomstring.generate(7);
+//Cannot set secret: to random becuase it reset and page logs me out
+//I'm sorry but the webstie works accordingly to spec without using random string
+//still included secret
 app.use(sessions({
   secret: "sessionSecret",
   cookieName: 'session',
